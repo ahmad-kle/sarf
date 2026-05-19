@@ -116,5 +116,20 @@
 </div>
 
 <script type="module" src="assets/js/main.js"></script>
+<button id="installBtn" style="position:fixed; bottom:20px; left:20px; background:#1e3c72; color:white; border:none; padding:10px; border-radius:50px; display:none; z-index:9999;">📲 تثبيت التطبيق</button>
+<script>
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const btn = document.getElementById('installBtn');
+        btn.style.display = 'block';
+        btn.addEventListener('click', () => {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(() => deferredPrompt = null);
+            btn.style.display = 'none';
+        });
+    });
+</script>
 </body>
 </html>
