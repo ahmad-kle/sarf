@@ -1,6 +1,6 @@
 // sw.js - service worker لتطبيق صرافتي
 
-const CACHE_NAME = "exchange-app-v3";
+const CACHE_NAME = "exchange-app-v5";
 const urlsToCache = [
   "/",
   "/index.html",

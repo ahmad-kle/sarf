@@ -3,6 +3,7 @@
   "short_name": "صرافتي",
   "description": "تطبيق لتحويل العملات بين الدولار، الليرة التركية والليرة السورية بأسعار محدثة",
   "start_url": "/",
+  "scope":"/",
   "display": "standalone",
   "theme_color": "#1e3c72",
   "background_color": "#ffffff",
