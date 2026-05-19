@@ -13,7 +13,7 @@ import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebase
 
 // ========== تسجيل Service Worker (لـ PWA) ==========
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js')
+    navigator.serviceWorker.register('/sarf/sw.js')
         .then(reg => console.log('✅ SW registered:', reg))
         .catch(err => console.error('❌ SW failed:', err));
 }

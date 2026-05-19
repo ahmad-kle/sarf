@@ -1,11 +1,11 @@
 const CACHE_NAME = "sarf-app-v2";
 const urlsToCache = [
-  "/",
-  "index.html",
-  "assets/css/style.css",
-  "assets/js/main.js",
-  "manifest.json",
-  "assets/img/icon.png"
+  "/sarf/",
+  "/sarf/index.html",
+  "/sarf/assets/css/style.css",
+  "/sarf/assets/js/main.js",
+  "/sarf/manifest.json",
+  "/sarf/assets/img/icon.png"
 ];
 
 self.addEventListener("install", event => {
