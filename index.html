@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>تبديل العملات</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<!-- شاشة التحميل -->
+<div id="splashScreen" class="splash-screen">
+    <div class="splash-content">
+        <div class="splash-icon">💱</div>
+        <h1>تبديل العملات</h1>
+        <p>تم التصميم بواسطة<br><strong>أحمد كلاوي Ahmad Kllawe</strong></p>
+        <div class="loader"></div>
+    </div>
+</div>
+
+<!-- المحتوى الرئيسي (يظهر بعد التحميل) -->
+<div id="mainContent" style="display: none;">
+    <div class="container">
+        <!-- شريط الإعلانات (أعلى الصفحة) -->
+        <div id="adBanner" class="ad-banner-top" style="display: none;">
+            <a id="adLink" href="#" target="_blank">
+                <img id="adImage" src="" alt="إعلان">
+                <p id="adText"></p>
+            </a>
+        </div>
+
+        <!-- بطاقة التحويل -->
+        <div class="card">
+            <div class="flex">
+                <h2>💱 تبديل العملات</h2>
+                <button class="theme-btn" id="themeToggle">🌙 ليلي</button>
+            </div>
+
+            <div class="rates-bar">
+                <div class="rate-item">💰 دولار → سوري جديد: <span id="usdRate">-</span></div>
+                <div class="rate-item">🇹🇷 تركي → سوري جديد: <span id="trySyrRate">-</span></div>
+                <div class="rate-item">💵 دولار → تركي: <span id="usdTryRate">-</span></div>
+            </div>
+
+            <div class="converter">
+                <div class="row">
+                    <select id="fromCurrency">
+                        <option value="usd">🇺🇸 دولار</option>
+                        <option value="try">🇹🇷 ليرة تركية</option>
+                        <option value="syr_new">🇸🇾 سوري جديد</option>
+                        <option value="syr_old">🇸🇾 سوري قديم</option>
+                    </select>
+                    <input type="number" id="amount" placeholder="المبلغ" value="1">
+                </div>
+                <div class="row">
+                    <select id="toCurrency">
+                        <option value="usd">🇺🇸 دولار</option>
+                        <option value="try">🇹🇷 ليرة تركية</option>
+                        <option value="syr_new">🇸🇾 سوري جديد</option>
+                        <option value="syr_old">🇸🇾 سوري قديم</option>
+                    </select>
+                    <button id="convertBtn">حوّل</button>
+                </div>
+                <div class="result-box">
+                    <div class="result-item">
+                        <span class="result-label">💰 سعر البيع (ستحصل):</span>
+                        <span id="sellResult" class="result-value">0</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">🛒 سعر الشراء (ستدفع):</span>
+                        <span id="buyResult" class="result-value">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="last-update">
+            <div>📅 آخر تحديث (التاريخ): <span id="lastDate">--</span></div>
+            <div>⏰ آخر تحديث (الوقت): <span id="lastTime">--</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- تذييل الصفحة -->
+<footer class="main-footer">
+    <div class="footer-content">
+        <p>تم التصميم بواسطة<br><strong>أحمد كلاوي</strong></p>
+<p><strong>Designed by Ahmad Kllawe</strong></p>
+        <div class="footer-links">
+            <a href="#" id="contactLink">📞 تواصل معنا</a>
+            <span class="sep">|</span>
+            <a href="#" id="privacyLink">🔒 الخصوصية</a>
+        </div>
+        <p class="small">© 2026 - جميع الحقوق محفوظة</p>
+    </div>
+</footer>
+
+<!-- مودال التواصل -->
+<div id="contactModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h3>📬 تواصل معنا</h3>
+        <div class="contact-info">
+            <p>📞 <strong>الهاتف:</strong> <a href="tel:+963954879356">+963 954 879 356</a></p>
+            <p>✉️ <strong>البريد الإلكتروني:</strong> <a href="mailto:ahmad@example.com">ahmadkelaui166@gmail.com</a></p>
+        </div>
+        <div class="designer-note">
+            <hr>
+            <p>تم التصميم بواسطة<br><strong>أحمد كلاوي</strong></p>
+<p><strong>Designed by Ahmad Kllawe</strong></p>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="assets/js/main.js"></script>
+</body>
+</html>

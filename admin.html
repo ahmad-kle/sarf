@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة المشرف - إدارة الأسعار والإعلانات</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(145deg, #e0eafc 0%, #cfdef3 100%);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        body.dark {
+            background: #121826;
+            color: #eef2ff;
+        }
+        .container { max-width: 750px; width: 100%; margin: 0 auto; }
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(2px);
+            border-radius: 32px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 20px 35px -10px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        body.dark .card {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        .flex { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        h2, h3 { margin-bottom: 20px; }
+        h2 {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #1e3c72, #2b5876);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        body.dark h2 {
+            background: linear-gradient(135deg, #a5d8ff, #74c0fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; }
+        input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 28px;
+            border: 1px solid #cbd5e1;
+            font-size: 16px;
+            background: white;
+        }
+        body.dark input {
+            background: #0f172a;
+            border-color: #475569;
+            color: #f1f5f9;
+        }
+        button {
+            background: linear-gradient(95deg, #1e3c72, #2b5876);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 8px;
+            transition: 0.2s;
+        }
+        button:hover { transform: translateY(-1px); }
+        .theme-btn, .logout-btn { background: #334155; }
+        .success, .error {
+            padding: 10px;
+            border-radius: 28px;
+            text-align: center;
+            margin-top: 15px;
+            display: none;
+        }
+        .success { background: #2e7d32; color: white; }
+        .error { background: #b91c1c; color: white; }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            font-size: 12px;
+            color: #5b6e8c;
+            border-top: 1px solid #cbd5e1;
+            width: 100%;
+            max-width: 750px;
+        }
+        body.dark .footer {
+            color: #94a3b8;
+            border-top-color: #334155;
+        }
+        hr { margin: 20px 0; }
+        .ad-item {
+            background: #f1f5f9;
+            border-radius: 24px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        body.dark .ad-item { background: #0f172a; }
+        .ad-info { flex: 1; }
+        .remove-ad-btn { background: #b91c1c; margin-right: 10px; }
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        /* تحسين الأزرار */
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .add-btn::before { content: "➕ "; }
+        .save-btn::before { content: "💾 "; }
+        .delete-btn::before { content: "🗑️ "; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <div class="flex">
+            <h2>🇸🇾 لوحة المشرف</h2>
+            <div>
+                <button class="theme-btn" id="themeToggle">🌙 ليلي</button>
+                <button class="logout-btn" id="logoutBtn">🚪 خروج</button>
+            </div>
+        </div>
+
+        <h3>💰 أسعار الصرف (دولار ← عملات)</h3>
+        <div class="input-group"><label>سعر شراء الدولار مقابل السوري الجديد</label><input type="number" id="usd_syr_buy" step="0.1"></div>
+        <div class="input-group"><label>سعر بيع الدولار مقابل السوري الجديد</label><input type="number" id="usd_syr_sell" step="0.1"></div>
+        <div class="input-group"><label>سعر شراء الدولار مقابل الليرة التركية</label><input type="number" id="usd_try_buy" step="0.1"></div>
+        <div class="input-group"><label>سعر بيع الدولار مقابل الليرة التركية</label><input type="number" id="usd_try_sell" step="0.1"></div>
+        <button id="saveRatesBtn" class="action-btn save-btn">💾 حفظ الأسعار</button>
+        <div id="ratesSuccess" class="success">✓ تم حفظ الأسعار</div>
+    </div>
+
+    <div class="card">
+        <h3>📢 إدارة الإعلانات</h3>
+        <div class="toggle-switch">
+            <span>🔘 حالة الإعلانات:</span>
+            <select id="adsEnabledSelect">
+                <option value="true">مفعلة (تظهر)</option>
+                <option value="false">معطلة (مخفية)</option>
+            </select>
+            <button id="saveAdsEnabledBtn" class="action-btn save-btn">حفظ الحالة</button>
+        </div>
+
+        <div id="adsListContainer"></div>
+
+        <div class="input-group"><label>➕ رابط الصورة (URL)</label><input type="text" id="newAdImage" placeholder="https://example.com/image.jpg"></div>
+        <div class="input-group"><label>📝 نص الإعلان</label><input type="text" id="newAdText" placeholder="عرض خاص..."></div>
+        <div class="input-group"><label>🔗 رابط الوجهة</label><input type="text" id="newAdLink" placeholder="https://..."></div>
+        <button id="addAdBtn" class="action-btn add-btn">➕ إضافة إعلان وحفظ فوري</button>
+        <div id="adsSuccess" class="success">✓ تم حفظ الإعلانات</div>
+        <div id="adsError" class="error">✗ فشل حفظ الإعلان</div>
+    </div>
+</div>
+<footer class="footer" style="margin-top: 20px;">
+   تم التصميم بواسطة أحمد كلاوي<br>
+Designed by Ahmad Kllawe<br>
+<a href="javascript:void(0)" id="footerContact">📞 تواصل معنا</a>
+</footer>
+
+
+<script type="module">
+    // نفس الكود السابق لإدارة الإعلانات والأسعار (من آخر نسخة عملت)
+    // مع إضافة مودال أو رابط تواصل بسيط في التذييل
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getDatabase, ref, onValue, update, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD5I0tSk73Iue1WaU3Jx_Q1LuwnFA2yrTo",
+        authDomain: "ahmad-1a32b.firebaseapp.com",
+        projectId: "ahmad-1a32b",
+        storageBucket: "ahmad-1a32b.firebasestorage.app",
+        messagingSenderId: "585031300322",
+        appId: "1:585031300322:web:d0af3e433e4ca3bf975abb",
+        measurementId: "G-C0GFV8C96P"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    onAuthStateChanged(auth, (user) => {
+        if (!user) window.location.href = "login.html";
+    });
+
+    // الأسعار
+    const ratesRef = ref(db, 'rates');
+    onValue(ratesRef, (snap) => {
+        if (snap.exists()) {
+            const d = snap.val();
+            document.getElementById('usd_syr_buy').value = d.usd_syr_buy || 137;
+            document.getElementById('usd_syr_sell').value = d.usd_syr_sell || 138;
+            document.getElementById('usd_try_buy').value = d.usd_try_buy || 44;
+            document.getElementById('usd_try_sell').value = d.usd_try_sell || 45;
+        }
+    });
+
+    document.getElementById('saveRatesBtn').addEventListener('click', async () => {
+        const usd_syr_buy = parseFloat(document.getElementById('usd_syr_buy').value);
+        const usd_syr_sell = parseFloat(document.getElementById('usd_syr_sell').value);
+        const usd_try_buy = parseFloat(document.getElementById('usd_try_buy').value);
+        const usd_try_sell = parseFloat(document.getElementById('usd_try_sell').value);
+        if (isNaN(usd_syr_buy) || isNaN(usd_syr_sell) || isNaN(usd_try_buy) || isNaN(usd_try_sell)) return;
+        await update(ratesRef, { usd_syr_buy, usd_syr_sell, usd_try_buy, usd_try_sell, last_update: new Date().toISOString() });
+        const msg = document.getElementById('ratesSuccess');
+        msg.style.display = 'block';
+        setTimeout(() => msg.style.display = 'none', 2000);
+    });
+
+    // الإعلانات (مصفوفة)
+    const adsRef = ref(db, 'adsArray');
+    const adsEnabledRef = ref(db, 'adsEnabled');
+    let adsArray = [];
+
+    function renderAdsList() {
+        const container = document.getElementById('adsListContainer');
+        if (!container) return;
+        if (!adsArray.length) {
+            container.innerHTML = '<p style="color:gray;">لا توجد إعلانات. أضف إعلاناً جديداً.</p>';
+            return;
+        }
+        let html = '';
+        adsArray.forEach((ad, idx) => {
+            html += `
+                <div class="ad-item">
+                    <div class="ad-info">
+                        <div><strong>الصورة:</strong> ${ad.imageUrl || 'لا يوجد'}</div>
+                        <div><strong>النص:</strong> ${ad.text || ''}</div>
+                        <div><strong>الرابط:</strong> ${ad.link || ''}</div>
+                    </div>
+                    <button class="remove-ad-btn action-btn delete-btn" data-index="${idx}">حذف</button>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+        document.querySelectorAll('.remove-ad-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const idx = parseInt(btn.getAttribute('data-index'));
+                adsArray.splice(idx, 1);
+                await set(adsRef, adsArray);
+                renderAdsList();
+                showMessage('adsSuccess', '✓ تم حذف الإعلان');
+            });
+        });
+    }
+
+    onValue(adsRef, (snapshot) => {
+        if (snapshot.exists() && Array.isArray(snapshot.val())) {
+            adsArray = snapshot.val();
+        } else {
+            adsArray = [];
+        }
+        renderAdsList();
+    });
+
+    onValue(adsEnabledRef, (snap) => {
+        document.getElementById('adsEnabledSelect').value = snap.val() === true ? 'true' : 'false';
+    });
+
+    document.getElementById('saveAdsEnabledBtn').addEventListener('click', async () => {
+        const val = document.getElementById('adsEnabledSelect').value === 'true';
+        await set(adsEnabledRef, val);
+        showMessage('adsSuccess', '✓ تم تحديث حالة الإعلانات');
+    });
+
+    document.getElementById('addAdBtn').addEventListener('click', async () => {
+        const imageUrl = document.getElementById('newAdImage').value.trim();
+        const text = document.getElementById('newAdText').value.trim();
+        const link = document.getElementById('newAdLink').value.trim();
+        if (!imageUrl && !text) {
+            alert("الرجاء إدخال رابط صورة أو نص إعلان.");
+            return;
+        }
+        adsArray.push({ imageUrl, text, link });
+        try {
+            await set(adsRef, adsArray);
+            document.getElementById('newAdImage').value = '';
+            document.getElementById('newAdText').value = '';
+            document.getElementById('newAdLink').value = '';
+            renderAdsList();
+            showMessage('adsSuccess', '✓ تمت إضافة الإعلان وحفظه');
+        } catch (error) {
+            showMessage('adsError', '✗ فشل حفظ الإعلان: ' + error.message);
+        }
+    });
+
+    function showMessage(elementId, message) {
+        const msgDiv = document.getElementById(elementId);
+        if (msgDiv) {
+            msgDiv.textContent = message;
+            msgDiv.style.display = 'block';
+            setTimeout(() => msgDiv.style.display = 'none', 3000);
+        }
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth).then(() => window.location.href = "login.html"));
+
+    // الوضع الليلي
+    const themeToggle = document.getElementById('themeToggle');
+    if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark');
+        localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+        themeToggle.innerText = document.body.classList.contains('dark') ? '☀️ نهاري' : '🌙 ليلي';
+    });
+    if (document.body.classList.contains('dark')) themeToggle.innerText = '☀️ نهاري';
+    else themeToggle.innerText = '🌙 ليلي';
+
+    // رابط تواصل في التذييل (ينبه المستخدم)
+    document.getElementById('footerContact')?.addEventListener('click', () => {
+        alert("للتواصل: هاتف +963 123 456 789 - بريد ahmad@example.com");
+    });
+</script>
+</body>
+</html>
