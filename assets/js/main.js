@@ -239,3 +239,32 @@ themeToggle.addEventListener('click', () => {
 });
 if (document.body.classList.contains('dark')) themeToggle.innerText = '☀️ نهاري';
 else themeToggle.innerText = '🌙 ليلي';
+// ========== إظهار تعليمات التثبيت لمستخدمي iOS ==========
+function isIOS() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+
+const iosGuide = document.getElementById('iosInstallGuide');
+const closeBtn = document.getElementById('closeIOSGuide');
+
+if (iosGuide && isIOS()) {
+    // التحقق من أن التطبيق لم يتم تثبيته بالفعل
+    const isInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    
+    if (!isInstalled) {
+        iosGuide.style.display = 'block';
+        
+        // حفظ اختيار المستخدم عند الإغلاق
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                iosGuide.style.display = 'none';
+                localStorage.setItem('ios_prompt_closed', 'true');
+            });
+        }
+        
+        // إخفاء الشريط إذا أغلق من قبل
+        if (localStorage.getItem('ios_prompt_closed') === 'true') {
+            iosGuide.style.display = 'none';
+        }
+    }
+}
