@@ -11,32 +11,57 @@ const firebaseConfig = {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
+// ========== تسجيل Service Worker (المسار الصحيح للمجلد الجذر sarf) ==========
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sarf/sw.js')
+        .then(reg => console.log('✅ SW registered:', reg))
+        .catch(err => console.error('❌ SW failed:', err));
+}
+
+// ========== شاشة التحميل ==========
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        const splash = document.getElementById('splashScreen');
+        const main = document.getElementById('mainContent');
+        if (splash && main) {
+            splash.style.opacity = '0';
+            setTimeout(() => {
+                splash.style.display = 'none';
+                main.style.display = 'block';
+            }, 500);
+        }
+    }, 1500);
+});
+
+// ========== مودال التواصل ==========
+const modal = document.getElementById('contactModal');
+const contactLink = document.getElementById('contactLink');
+const closeModal = document.querySelector('.close-modal');
+if (contactLink) {
+    contactLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (modal) modal.style.display = 'flex';
+    });
+}
+if (closeModal) {
+    closeModal.addEventListener('click', () => {
+        if (modal) modal.style.display = 'none';
+    });
+}
+window.addEventListener('click', (e) => {
+    if (e.target === modal) modal.style.display = 'none';
+});
+
+// ========== باقي كود التطبيق (نفسه دون تغيير) ==========
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// ---- الأسعار ----
-let usdSyrBuy = 137, usdSyrSell = 138, usdTryBuy = 44, usdTrySell = 45;
+let usdSyrBuy = 137;
+let usdSyrSell = 138;
+let usdTryBuy = 44;
+let usdTrySell = 45;
+
 const ratesRef = ref(db, 'rates');
-
-// متغير لتتبع عدد المهام المطلوبة قبل إخفاء شاشة التحميل
-let loadedCount = 0;
-const totalToLoad = 2; // rates + adsArray
-
-function hideSplashIfReady() {
-    loadedCount++;
-    if (loadedCount >= totalToLoad) {
-        setTimeout(() => {
-            const splash = document.getElementById('splashScreen');
-            const main = document.getElementById('mainContent');
-            if (splash) splash.style.opacity = '0';
-            setTimeout(() => {
-                if (splash) splash.style.display = 'none';
-                if (main) main.style.display = 'block';
-            }, 500);
-        }, 500);
-    }
-}
-
 onValue(ratesRef, (snapshot) => {
     if (!snapshot.exists()) {
         set(ratesRef, {
@@ -64,10 +89,9 @@ onValue(ratesRef, (snapshot) => {
             document.getElementById('lastTime').innerText = d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         }
     }
-    hideSplashIfReady();
 });
 
-// ---- الإعلانات ----
+// الإعلانات
 let adsArray = [];
 let currentAdIndex = 0;
 let adInterval = null;
@@ -105,24 +129,24 @@ function startAdRotation() {
     }
 }
 
-const adsArrayRef = ref(db, 'adsArray');
-onValue(adsArrayRef, (snapshot) => {
+const adsRef = ref(db, 'adsArray');
+const adsEnabledRef = ref(db, 'adsEnabled');
+
+onValue(adsRef, (snapshot) => {
     if (snapshot.exists() && Array.isArray(snapshot.val())) {
         adsArray = snapshot.val();
     } else {
         adsArray = [];
     }
     startAdRotation();
-    hideSplashIfReady();
 });
 
-const adsEnabledRef = ref(db, 'adsEnabled');
 onValue(adsEnabledRef, (snapshot) => {
     adsEnabled = snapshot.val() === true;
     startAdRotation();
 });
 
-// ---- دوال التحويل (نفس السابق) ----
+// دوال التحويل
 function getSellPrice(amount, from, to) {
     if (from === to) return amount;
     if (from === 'syr_old' && to === 'syr_new') return amount / 100;
@@ -182,38 +206,3 @@ themeToggle.addEventListener('click', () => {
 });
 if (document.body.classList.contains('dark')) themeToggle.innerText = '☀️ نهاري';
 else themeToggle.innerText = '🌙 ليلي';
-
-// شاشة التحميل
-window.addEventListener('load', () => {
-    setTimeout(() => {
-        const splash = document.getElementById('splashScreen');
-        const main = document.getElementById('mainContent');
-        if (splash && main) {
-            splash.style.opacity = '0';
-            setTimeout(() => {
-                splash.style.display = 'none';
-                main.style.display = 'block';
-            }, 500);
-        }
-    }, 1500);
-});
-
-// مودال التواصل
-const modal = document.getElementById('contactModal');
-const contactLink = document.getElementById('contactLink');
-const closeModal = document.querySelector('.close-modal');
-
-if (contactLink) {
-    contactLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        modal.style.display = 'flex';
-    });
-}
-if (closeModal) {
-    closeModal.addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
-}
-window.addEventListener('click', (e) => {
-    if (e.target === modal) modal.style.display = 'none';
-});

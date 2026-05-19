@@ -1,9 +1,8 @@
 {
-  "name": "تبديل العملات - صرافتي",
+  "name": "تبديل العملات",
   "short_name": "صرافتي",
-  "description": "تطبيق لتحويل العملات بين الدولار، الليرة التركية والليرة السورية بأسعار محدثة",
   "start_url": "/sarf/",
-  "scope":"/sarf/",
+  "scope": "/sarf/",
   "display": "standalone",
   "theme_color": "#1e3c72",
   "background_color": "#ffffff",
@@ -11,32 +10,12 @@
   "dir": "rtl",
   "icons": [
     {
-      "src": "assets/img/icon.png",
-      "sizes": "72x72",
-      "type": "image/png"
-    },
-    {
-      "src": "assets/img/icon.png",
-      "sizes": "96x96",
-      "type": "image/png"
-    },
-    {
-      "src": "assets/img/icon.png",
-      "sizes": "152x152",
-      "type": "image/png"
-    },
-    {
-      "src": "assets/img/icon.png",
+      "src": "/sarf/assets/img/icon.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "assets/img/icon.png",
-      "sizes": "384x384",
-      "type": "image/png"
-    },
-    {
-      "src": "assets/img/icon.png",
+      "src": "/sarf/assets/img/icon.png",
       "sizes": "512x512",
       "type": "image/png"
     }
