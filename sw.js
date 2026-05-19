@@ -1,4 +1,4 @@
-const CACHE_NAME = "sarf-app-v6";
+const CACHE_NAME = "sarf-app-v7";
 const urlsToCache = [
   ".",
   "index.html",
