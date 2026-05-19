@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>تبديل العملات</title>
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="manifest" href="/sarf/manifest.json">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#1e3c72">
-    <link rel="apple-touch-icon" href="/sarf/assets/images/icon-192.png">
+    <link rel="apple-touch-icon" href="/assets/img/icon.png">
 </head>
 <body>
+
 <!-- شاشة التحميل -->
 <div id="splashScreen" class="splash-screen">
     <div class="splash-content">
@@ -23,22 +24,26 @@
 
 <div id="mainContent" style="display: none;">
     <div class="container">
+        <!-- شريط الإعلانات -->
         <div id="adBanner" class="ad-banner-top" style="display: none;">
             <a id="adLink" href="#" target="_blank">
                 <img id="adImage" src="" alt="إعلان">
                 <p id="adText"></p>
             </a>
         </div>
+
         <div class="card">
             <div class="flex">
                 <h2>💱 تبديل العملات</h2>
                 <button class="theme-btn" id="themeToggle">🌙 ليلي</button>
             </div>
+
             <div class="rates-bar">
                 <div class="rate-item">💰 دولار → سوري جديد: <span id="usdRate">-</span></div>
                 <div class="rate-item">🇹🇷 تركي → سوري جديد: <span id="trySyrRate">-</span></div>
                 <div class="rate-item">💵 دولار → تركي: <span id="usdTryRate">-</span></div>
             </div>
+
             <div class="converter">
                 <div class="row">
                     <select id="fromCurrency">
@@ -70,9 +75,17 @@
                 </div>
             </div>
         </div>
+
         <div class="last-update">
             <div>📅 آخر تحديث (التاريخ): <span id="lastDate">--</span></div>
             <div>⏰ آخر تحديث (الوقت): <span id="lastTime">--</span></div>
+        </div>
+
+        <!-- زر تثبيت التطبيق -->
+        <div style="text-align: center; margin: 20px 0;">
+            <button id="installAppBtn" style="display: none; background: linear-gradient(95deg, #1e3c72, #2b5876); color: white; border: none; padding: 12px 24px; border-radius: 50px; font-size: 1rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s;">
+                📲 تثبيت التطبيق
+            </button>
         </div>
     </div>
 </div>
@@ -88,6 +101,7 @@
     </div>
 </footer>
 
+<!-- مودال التواصل -->
 <div id="contactModal" class="modal">
     <div class="modal-content">
         <span class="close-modal">&times;</span>
@@ -99,6 +113,6 @@
     </div>
 </div>
 
-<script type="module" src="assets/js/main.js"></script>
+<script type="module" src="/assets/js/main.js"></script>
 </body>
 </html>

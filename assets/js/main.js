@@ -11,9 +11,9 @@ const firebaseConfig = {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-// ========== تسجيل Service Worker (المسار الصحيح للمجلد الجذر sarf) ==========
+// ========== تسجيل Service Worker (لـ PWA) ==========
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sarf/sw.js')
+    navigator.serviceWorker.register('/sw.js')
         .then(reg => console.log('✅ SW registered:', reg))
         .catch(err => console.error('❌ SW failed:', err));
 }
@@ -33,10 +33,33 @@ window.addEventListener('load', () => {
     }, 1500);
 });
 
+// ========== زر تثبيت التطبيق ==========
+let deferredPrompt;
+const installBtn = document.getElementById('installAppBtn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (installBtn) installBtn.style.display = 'inline-block';
+});
+
+if (installBtn) {
+    installBtn.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`User ${outcome}`);
+            deferredPrompt = null;
+            installBtn.style.display = 'none';
+        }
+    });
+}
+
 // ========== مودال التواصل ==========
 const modal = document.getElementById('contactModal');
 const contactLink = document.getElementById('contactLink');
 const closeModal = document.querySelector('.close-modal');
+
 if (contactLink) {
     contactLink.addEventListener('click', (e) => {
         e.preventDefault();
@@ -52,16 +75,19 @@ window.addEventListener('click', (e) => {
     if (e.target === modal) modal.style.display = 'none';
 });
 
-// ========== باقي كود التطبيق (نفسه دون تغيير) ==========
+// ========== بدء التطبيق ==========
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+// الأسعار
 let usdSyrBuy = 137;
 let usdSyrSell = 138;
 let usdTryBuy = 44;
 let usdTrySell = 45;
 
 const ratesRef = ref(db, 'rates');
+
+// إنشاء بيانات افتراضية إذا لم توجد
 onValue(ratesRef, (snapshot) => {
     if (!snapshot.exists()) {
         set(ratesRef, {
@@ -69,7 +95,12 @@ onValue(ratesRef, (snapshot) => {
             usd_try_buy: 44, usd_try_sell: 45,
             last_update: new Date().toISOString()
         }).catch(console.error);
-    } else {
+    }
+});
+
+// قراءة الأسعار
+onValue(ratesRef, (snapshot) => {
+    if (snapshot.exists()) {
         const data = snapshot.val();
         usdSyrBuy = data.usd_syr_buy || 137;
         usdSyrSell = data.usd_syr_sell || 138;
@@ -91,7 +122,7 @@ onValue(ratesRef, (snapshot) => {
     }
 });
 
-// الإعلانات
+// ========== الإعلانات (مصفوفة) ==========
 let adsArray = [];
 let currentAdIndex = 0;
 let adInterval = null;
@@ -146,11 +177,12 @@ onValue(adsEnabledRef, (snapshot) => {
     startAdRotation();
 });
 
-// دوال التحويل
+// ========== دوال التحويل ==========
 function getSellPrice(amount, from, to) {
     if (from === to) return amount;
     if (from === 'syr_old' && to === 'syr_new') return amount / 100;
     if (from === 'syr_new' && to === 'syr_old') return amount * 100;
+
     let usdValue = 0;
     switch (from) {
         case 'usd': usdValue = amount; break;
@@ -171,6 +203,7 @@ function getBuyPrice(amount, from, to) {
     if (from === to) return amount;
     if (from === 'syr_old' && to === 'syr_new') return amount / 100;
     if (from === 'syr_new' && to === 'syr_old') return amount * 100;
+
     let usdValue = 0;
     switch (from) {
         case 'usd': usdValue = amount; break;
@@ -196,7 +229,7 @@ document.getElementById('convertBtn').addEventListener('click', () => {
     document.getElementById('buyResult').innerText = getBuyPrice(amount, from, to).toFixed(2);
 });
 
-// الوضع الليلي
+// ========== الوضع الليلي ==========
 const themeToggle = document.getElementById('themeToggle');
 if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
 themeToggle.addEventListener('click', () => {
