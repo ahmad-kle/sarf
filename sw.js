@@ -9,7 +9,7 @@ const urlsToCache = [
   "/sarf/login.html",
   "/sarf/admin.html",
   "/sarf/manifest.json",
-  "sarf/assets/img/icon.png"
+  "/sarf/assets/img/icon.png"
 ];
 
 // تثبيت الـ Service Worker وتخزين الملفات الأساسية
