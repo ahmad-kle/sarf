@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://ahmad-kle.github.io/sarf/sitemap.xml
