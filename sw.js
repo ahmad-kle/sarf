@@ -1,15 +1,15 @@
 // sw.js - service worker لتطبيق صرافتي
 
-const CACHE_NAME = "exchange-app-v5";
+const CACHE_NAME = "exchange-app-v6";
 const urlsToCache = [
-  "/",
-  "/index.html",
-  "/style.css",
-  "/script.js",
-  "/login.html",
-  "/admin.html",
-  "/manifest.json",
-  "assets/img/icon.png"
+  "/sarf/",
+  "/sarf/index.html",
+  "/sarf/style.css",
+  "/sarf/script.js",
+  "/sarf/login.html",
+  "/sarf/admin.html",
+  "/sarf/manifest.json",
+  "sarf/assets/img/icon.png"
 ];
 
 // تثبيت الـ Service Worker وتخزين الملفات الأساسية
