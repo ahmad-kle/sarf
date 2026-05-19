@@ -1,8 +1,8 @@
 {
   "name": "تبديل العملات",
   "short_name": "صرافتي",
-"start_url": "https://ahmad-kle.github.io/sarf/",
-"scope": "https://ahmad-kle.github.io/sarf/",
+"start_url": ".",
+"scope": ".",
   "display": "standalone",
   "theme_color": "#1e3c72",
   "background_color": "#ffffff",
