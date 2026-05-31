@@ -177,7 +177,7 @@ onValue(adsEnabledRef, (snapshot) => {
     startAdRotation();
 });
 
-// ========== دوال التحويل ==========
+// ========== دوال التحويل (بدون تغيير منطقها) ==========
 function getSellPrice(amount, from, to) {
     if (from === to) return amount;
     if (from === 'syr_old' && to === 'syr_new') return amount / 100;
@@ -220,13 +220,27 @@ function getBuyPrice(amount, from, to) {
     return 0;
 }
 
+// ========== دالة جديدة لعرض الأرقام بدون أصفار عشرية زائدة + فواصل آلاف ==========
+function formatNumber(value) {
+    if (isNaN(value)) return '0';
+    // استخدام Intl.NumberFormat للغة العربية: يفصل الآلاف ويقلل الأصفار العشرية
+    return new Intl.NumberFormat('en', {
+        maximumFractionDigits: 2,
+        minimumFractionDigits: 0
+    }).format(value);
+}
+
 document.getElementById('convertBtn').addEventListener('click', () => {
     let amount = parseFloat(document.getElementById('amount').value);
     if (isNaN(amount)) amount = 0;
     const from = document.getElementById('fromCurrency').value;
     const to = document.getElementById('toCurrency').value;
-    document.getElementById('sellResult').innerText = getSellPrice(amount, from, to).toFixed(2);
-    document.getElementById('buyResult').innerText = getBuyPrice(amount, from, to).toFixed(2);
+    
+    const sellValue = getSellPrice(amount, from, to);
+    const buyValue = getBuyPrice(amount, from, to);
+    
+    document.getElementById('sellResult').innerText = formatNumber(sellValue);
+    document.getElementById('buyResult').innerText = formatNumber(buyValue);
 });
 
 // ========== الوضع الليلي ==========
@@ -239,6 +253,7 @@ themeToggle.addEventListener('click', () => {
 });
 if (document.body.classList.contains('dark')) themeToggle.innerText = '☀️ نهاري';
 else themeToggle.innerText = '🌙 ليلي';
+
 // ========== إظهار تعليمات التثبيت لمستخدمي iOS ==========
 function isIOS() {
     return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
@@ -248,13 +263,11 @@ const iosGuide = document.getElementById('iosInstallGuide');
 const closeBtn = document.getElementById('closeIOSGuide');
 
 if (iosGuide && isIOS()) {
-    // التحقق من أن التطبيق لم يتم تثبيته بالفعل
     const isInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
     
     if (!isInstalled) {
         iosGuide.style.display = 'block';
         
-        // حفظ اختيار المستخدم عند الإغلاق
         if (closeBtn) {
             closeBtn.addEventListener('click', () => {
                 iosGuide.style.display = 'none';
@@ -262,7 +275,6 @@ if (iosGuide && isIOS()) {
             });
         }
         
-        // إخفاء الشريط إذا أغلق من قبل
         if (localStorage.getItem('ios_prompt_closed') === 'true') {
             iosGuide.style.display = 'none';
         }
