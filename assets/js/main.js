@@ -1,5 +1,5 @@
 // ============================================================
-//  صرّاف - النسخة النهائية مع ملاحظة تحذيرية للذهب
+//  صرّاف - النسخة النهائية مع تحسينات للهواتف
 // ============================================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -101,35 +101,62 @@ function listenToFirebaseRates() {
             usdTrySell = 46.50;
             updateUI();
         }
+    }, (error) => {
+        console.warn('⚠️ خطأ في Firebase:', error);
+        // استخدام القيم الافتراضية عند فشل Firebase
+        usdSyrBuy = 13200;
+        usdSyrSell = 13100;
+        usdTryBuy = 47.15;
+        usdTrySell = 46.50;
+        updateUI();
     });
 }
 
 // ============================================================
-// 🔥 جلب سعر الذهب من API مباشرة
+// 🔥 جلب سعر الذهب من API مع مهلة زمنية وتجربة إعادة المحاولة
 // ============================================================
-async function fetchGoldPrice(showToastMsg = true) {
+async function fetchGoldPrice(showToastMsg = true, retry = 3) {
     try {
         console.log('🥇 جاري جلب سعر الذهب...');
         let newPrice = null;
-        const res = await fetch('https://api.gold-api.com/price/XAU');
-        if (res.ok) {
-            const data = await res.json();
-            if (data && data.price && data.price > 0) {
-                newPrice = parseFloat(data.price);
-                console.log('✅ Gold (Gold-API):', newPrice);
-            }
-        }
-        if (!newPrice) {
-            const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-            const altRes = await fetch(proxyUrl + 'https://api.gold-api.com/price/XAU');
-            if (altRes.ok) {
-                const altData = await altRes.json();
-                if (altData && altData.price && altData.price > 0) {
-                    newPrice = parseFloat(altData.price);
-                    console.log('✅ Gold (Gold-API via proxy):', newPrice);
+        // محاولة مع مهلة 10 ثوانٍ
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        
+        try {
+            const res = await fetch('https://api.gold-api.com/price/XAU', { signal: controller.signal });
+            clearTimeout(timeoutId);
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.price && data.price > 0) {
+                    newPrice = parseFloat(data.price);
+                    console.log('✅ Gold (Gold-API):', newPrice);
                 }
             }
+        } catch (fetchErr) {
+            console.warn('⚠️ Gold-API فشل:', fetchErr.message);
         }
+
+        if (!newPrice) {
+            // محاولة عبر Proxy
+            const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+            const proxyController = new AbortController();
+            const proxyTimeout = setTimeout(() => proxyController.abort(), 10000);
+            try {
+                const altRes = await fetch(proxyUrl + 'https://api.gold-api.com/price/XAU', { signal: proxyController.signal });
+                clearTimeout(proxyTimeout);
+                if (altRes.ok) {
+                    const altData = await altRes.json();
+                    if (altData && altData.price && altData.price > 0) {
+                        newPrice = parseFloat(altData.price);
+                        console.log('✅ Gold (Gold-API via proxy):', newPrice);
+                    }
+                }
+            } catch (proxyErr) {
+                console.warn('⚠️ Proxy فشل:', proxyErr.message);
+            }
+        }
+
         if (newPrice) {
             goldUsdOunce = newPrice;
             console.log(`✅ تم تحديث الذهب: ${goldUsdOunce}`);
@@ -138,9 +165,14 @@ async function fetchGoldPrice(showToastMsg = true) {
                 showToast('✅ تم تحديث الذهب');
             }
         } else {
-            console.warn('⚠️ فشل جلب الذهب');
-            if (showToastMsg) {
-                showToast('⚠️ فشل تحديث الذهب');
+            if (retry > 0) {
+                console.log(`🔄 إعادة المحاولة... ${retry} محاولات متبقية`);
+                setTimeout(() => fetchGoldPrice(showToastMsg, retry - 1), 2000);
+            } else {
+                console.warn('⚠️ فشل جلب الذهب بعد جميع المحاولات');
+                if (showToastMsg) {
+                    showToast('⚠️ فشل تحديث الذهب');
+                }
             }
         }
     } catch (err) {
@@ -166,11 +198,11 @@ function updateUI() {
     const buyPrice = gram21Usd - 1;
     
     gold21GramRateEl.textContent = `${formatNumber(buyPrice)} / ${formatNumber(sellPrice)}`;
-    gold21GramSubEl.innerHTML = ` · <span style="color:#d32f2f; font-weight:800; background:#ffebee; padding:2px 8px; border-radius:12px; font-size:0.7rem;">⚠️ تجريبي   </span>`;
+    gold21GramSubEl.innerHTML = `$ / غرام · <span style="color:#d32f2f; font-weight:800; background:#ffebee; padding:2px 8px; border-radius:12px; font-size:0.6rem;">⚠️ تجريبي</span>`;
 }
 
 // ============================================================
-// دوال التحويل
+// دوال التحويل (نفسها)
 // ============================================================
 function convertCurrency(amount, from, to, type = 'sell') {
     if (amount === 0) return 0;
@@ -252,11 +284,11 @@ function showToast(msg) {
     const div = document.createElement('div');
     div.className = 'custom-toast';
     div.style.cssText = `
-        position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-        background: var(--gold); color: #1a1a1a; padding: 12px 24px;
-        border-radius: 50px; font-weight: 700; z-index: 9999;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.2); font-family: 'Tajawal', sans-serif;
-        transition: opacity 0.3s;
+        position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%);
+        background: var(--gold); color: #1a1a1a; padding: 10px 20px;
+        border-radius: 40px; font-weight: 700; z-index: 9999;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15); font-family: 'Tajawal', sans-serif;
+        transition: opacity 0.3s; font-size: 0.9rem;
     `;
     div.textContent = msg;
     document.body.appendChild(div);
@@ -270,7 +302,8 @@ fromSelect.addEventListener('change', convert);
 toSelect.addEventListener('change', convert);
 
 refreshBtn.addEventListener('click', () => {
-    fetchGoldPrice(false);
+    showToast('🔄 جاري التحديث...');
+    fetchGoldPrice(true);
 });
 
 calcGoldBtn.addEventListener('click', calcGold);
@@ -374,11 +407,12 @@ onValue(adsEnabledRef, (snap) => {
 setTimeout(() => {
     splash.classList.add('hidden');
     main.style.display = 'block';
-}, 1500);
+}, 1200);
 
 listenToFirebaseRates();
-fetchGoldPrice(false);
+// محاولة جلب الذهب مع تأخير بسيط لضمان تحميل الصفحة
+setTimeout(() => fetchGoldPrice(false), 500);
 setInterval(() => fetchGoldPrice(false), 300000);
-setTimeout(convert, 500);
+setTimeout(convert, 800);
 
-console.log('✅ تطبيق صرّاف جاهز');
+console.log('✅ تطبيق صرّاف جاهز (مُحسّن للهواتف)');

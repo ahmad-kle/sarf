@@ -2,10 +2,11 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>صرّاف – تحويل العملات والذهب</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1a2a3a">
+    <meta name="description" content="صرّاف - تطبيق تحويل العملات والذهب بأسعار فورية">
     <link rel="apple-touch-icon" href="assets/img/icon512.png">
 
     <!-- Google Fonts -->
@@ -14,7 +15,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
-        /* ===== RESET & BASE ===== */
+        /* ===== RESET & BASE (محسّن للهواتف) ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --primary: #1a2a3a;
@@ -24,8 +25,8 @@
             --bg-dark: #121a24;
             --text-light: #f0ece6;
             --text-dark: #1a1a1a;
-            --shadow: 0 8px 32px rgba(0,0,0,0.10);
-            --radius: 28px;
+            --shadow: 0 4px 16px rgba(0,0,0,0.08);
+            --radius: 20px;
         }
         body {
             font-family: 'Tajawal', sans-serif;
@@ -33,7 +34,7 @@
             color: var(--text-dark);
             transition: background 0.3s, color 0.3s;
             min-height: 100vh;
-            padding: 16px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -54,26 +55,26 @@
             z-index: 9999; transition: opacity 0.6s ease;
         }
         .splash-screen.hidden { opacity: 0; pointer-events: none; }
-        .splash-icon { font-size: 80px; margin-bottom: 20px; animation: float 2s ease-in-out infinite; }
-        .splash-title { color: var(--gold); font-size: 2.4rem; font-weight: 900; letter-spacing: 2px; }
-        .splash-sub { color: #aaa; font-size: 1rem; margin-top: 8px; }
-        .splash-loader { margin-top: 30px; width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--gold); border-radius: 50%; animation: spin 1s linear infinite; }
+        .splash-icon { font-size: 70px; margin-bottom: 16px; animation: float 2s ease-in-out infinite; }
+        .splash-title { color: var(--gold); font-size: 2.2rem; font-weight: 900; letter-spacing: 1px; }
+        .splash-sub { color: #aaa; font-size: 0.9rem; margin-top: 6px; }
+        .splash-loader { margin-top: 24px; width: 36px; height: 36px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--gold); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+        @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
         /* ===== HEADER ===== */
         .header {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 0; margin-bottom: 20px;
+            padding: 8px 0; margin-bottom: 16px;
         }
-        .logo { display: flex; align-items: center; gap: 10px; }
-        .logo i { font-size: 2rem; color: var(--gold); }
-        .logo h1 { font-size: 1.6rem; font-weight: 900; color: var(--primary); }
+        .logo { display: flex; align-items: center; gap: 8px; }
+        .logo i { font-size: 1.8rem; color: var(--gold); }
+        .logo h1 { font-size: 1.4rem; font-weight: 900; color: var(--primary); }
         body.dark .logo h1 { color: var(--text-light); }
-        .header-actions { display: flex; gap: 10px; }
+        .header-actions { display: flex; gap: 8px; }
         .header-actions button {
-            background: rgba(0,0,0,0.05); border: none; width: 44px; height: 44px;
-            border-radius: 50%; font-size: 1.2rem; cursor: pointer; transition: 0.2s;
+            background: rgba(0,0,0,0.05); border: none; width: 40px; height: 40px;
+            border-radius: 50%; font-size: 1.1rem; cursor: pointer; transition: 0.2s;
             color: var(--primary);
         }
         body.dark .header-actions button { background: rgba(255,255,255,0.08); color: var(--text-light); }
@@ -82,88 +83,94 @@
         /* ===== BANNER ADS ===== */
         .ad-banner {
             background: rgba(255,255,255,0.85); backdrop-filter: blur(10px);
-            border-radius: var(--radius); padding: 10px 16px; margin-bottom: 20px;
+            border-radius: var(--radius); padding: 8px 12px; margin-bottom: 16px;
             text-align: center; box-shadow: var(--shadow);
-            border: 1px solid rgba(212,175,55,0.2); transition: 0.3s;
+            border: 1px solid rgba(212,175,55,0.15);
         }
-        body.dark .ad-banner { background: rgba(30,40,55,0.85); border-color: rgba(212,175,55,0.1); }
-        .ad-banner a { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-        .ad-banner img { max-width: 100%; max-height: 90px; border-radius: 16px; object-fit: contain; }
-        .ad-banner p { font-size: 0.9rem; font-weight: 600; color: var(--primary); }
+        body.dark .ad-banner { background: rgba(30,40,55,0.85); border-color: rgba(212,175,55,0.08); }
+        .ad-banner a { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .ad-banner img { max-width: 100%; max-height: 70px; border-radius: 12px; object-fit: contain; }
+        .ad-banner p { font-size: 0.8rem; font-weight: 600; color: var(--primary); margin: 0; }
         body.dark .ad-banner p { color: var(--gold); }
 
-        /* ===== RATES GRID ===== */
+        /* ===== RATES GRID (أكثر مرونة) ===== */
         .rates-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        @media (min-width: 480px) {
+            .rates-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (min-width: 600px) {
+            .rates-grid { grid-template-columns: repeat(4, 1fr); }
         }
         .rate-item {
             background: rgba(0,0,0,0.04);
-            border-radius: 20px;
-            padding: 12px 8px;
+            border-radius: 16px;
+            padding: 10px 6px;
             text-align: center;
             font-weight: 600;
-            font-size: 0.8rem;
-            border: 1px solid rgba(212,175,55,0.15);
+            font-size: 0.75rem;
+            border: 1px solid rgba(212,175,55,0.12);
             transition: 0.2s;
         }
         body.dark .rate-item {
             background: rgba(255,255,255,0.04);
-            border-color: rgba(212,175,55,0.08);
+            border-color: rgba(212,175,55,0.06);
         }
         .rate-item .label {
             display: block;
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             opacity: 0.7;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
         .rate-item .value {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 800;
             color: var(--gold);
             direction: ltr;
         }
         .rate-item .sub {
-            font-size: 0.65rem;
+            font-size: 0.55rem;
             opacity: 0.6;
             direction: ltr;
         }
         .rate-item.gold-item {
-            background: linear-gradient(145deg, rgba(212,175,55,0.12), rgba(212,175,55,0.04));
+            background: linear-gradient(145deg, rgba(212,175,55,0.10), rgba(212,175,55,0.02));
             border-color: var(--gold);
         }
         body.dark .rate-item.gold-item {
-            background: linear-gradient(145deg, rgba(212,175,55,0.08), rgba(212,175,55,0.02));
+            background: linear-gradient(145deg, rgba(212,175,55,0.06), rgba(212,175,55,0.01));
         }
         .rate-item.gold-item .value {
             color: var(--gold);
-            font-size: 1.3rem;
+            font-size: 1.1rem;
         }
 
         /* ===== CARD ===== */
         .card {
             background: rgba(255,255,255,0.92);
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(8px);
             border-radius: var(--radius);
-            padding: 24px;
-            margin-bottom: 24px;
+            padding: 16px;
+            margin-bottom: 16px;
             box-shadow: var(--shadow);
             border: 1px solid rgba(255,255,255,0.3);
             transition: 0.3s;
         }
         body.dark .card {
             background: rgba(30,40,55,0.9);
-            border-color: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.04);
         }
         .card-title {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 800;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             color: var(--primary);
         }
         body.dark .card-title { color: var(--gold); }
@@ -171,19 +178,19 @@
         /* ===== CONVERTER ===== */
         .converter-row {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             flex-wrap: wrap;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
         .converter-row select,
         .converter-row input {
-            flex: 1;
-            min-width: 120px;
-            padding: 14px 18px;
-            border-radius: 50px;
+            flex: 1 1 100%;
+            min-width: 100%;
+            padding: 12px 14px;
+            border-radius: 40px;
             border: 2px solid #e0d6cc;
             font-family: inherit;
-            font-size: 1rem;
+            font-size: 0.95rem;
             background: white;
             transition: 0.2s;
             outline: none;
@@ -194,6 +201,13 @@
             border-color: #3a4a5a;
             color: white;
         }
+        @media (min-width: 480px) {
+            .converter-row select,
+            .converter-row input {
+                flex: 1;
+                min-width: 120px;
+            }
+        }
         .converter-row select:focus,
         .converter-row input:focus {
             border-color: var(--gold);
@@ -202,15 +216,19 @@
         .converter-row button {
             background: linear-gradient(145deg, var(--gold), #b8962e);
             border: none;
-            padding: 14px 28px;
-            border-radius: 50px;
+            padding: 12px 20px;
+            border-radius: 40px;
             font-weight: 800;
             color: #1a1a1a;
             cursor: pointer;
             transition: 0.2s;
             font-family: inherit;
-            font-size: 1rem;
+            font-size: 0.95rem;
             box-shadow: 0 4px 12px rgba(212,175,55,0.3);
+            flex: 1 1 100%;
+        }
+        @media (min-width: 480px) {
+            .converter-row button { flex: 0 1 auto; min-width: 100px; }
         }
         .converter-row button:hover {
             transform: translateY(-2px);
@@ -219,22 +237,23 @@
 
         .result-box {
             background: rgba(0,0,0,0.03);
-            border-radius: 24px;
-            padding: 16px;
-            margin-top: 12px;
+            border-radius: 20px;
+            padding: 12px;
+            margin-top: 10px;
         }
-        body.dark .result-box { background: rgba(255,255,255,0.04); }
+        body.dark .result-box { background: rgba(255,255,255,0.03); }
         .result-item {
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
+            padding: 8px 0;
             border-bottom: 1px solid rgba(0,0,0,0.05);
+            font-size: 0.9rem;
         }
-        body.dark .result-item { border-color: rgba(255,255,255,0.05); }
+        body.dark .result-item { border-color: rgba(255,255,255,0.04); }
         .result-item:last-child { border-bottom: none; }
         .result-label { font-weight: 600; }
         .result-value {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: 800;
             color: var(--gold);
             direction: ltr;
@@ -243,18 +262,17 @@
         /* ===== GOLD CALCULATOR ===== */
         .gold-inputs {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             flex-wrap: wrap;
         }
         .gold-inputs input,
         .gold-inputs select {
-            flex: 1;
-            min-width: 100px;
-            padding: 12px 16px;
-            border-radius: 50px;
+            flex: 1 1 100%;
+            padding: 12px 14px;
+            border-radius: 40px;
             border: 2px solid #e0d6cc;
             font-family: inherit;
-            font-size: 1rem;
+            font-size: 0.95rem;
             background: white;
             outline: none;
         }
@@ -264,80 +282,91 @@
             border-color: #3a4a5a;
             color: white;
         }
+        @media (min-width: 480px) {
+            .gold-inputs input,
+            .gold-inputs select { flex: 1; min-width: 100px; }
+        }
         .gold-result {
-            margin-top: 16px;
+            margin-top: 12px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 10px;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        @media (min-width: 480px) {
+            .gold-result { grid-template-columns: repeat(3, 1fr); }
         }
         .gold-result .price-box {
-            background: rgba(212,175,55,0.08);
-            border-radius: 16px;
-            padding: 12px;
+            background: rgba(212,175,55,0.06);
+            border-radius: 14px;
+            padding: 10px;
             text-align: center;
-            border: 1px solid rgba(212,175,55,0.15);
+            border: 1px solid rgba(212,175,55,0.10);
         }
         .gold-result .price-box .currency {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             opacity: 0.7;
         }
         .gold-result .price-box .amount {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 800;
             color: var(--gold);
             direction: ltr;
         }
 
-        /* ===== GOLD WARNING ===== */
+        /* ===== تحذير حاسبة الذهب ===== */
         .gold-warning {
-            text-align: center;
-            margin-top: 16px;
-            padding: 10px 16px;
+            margin-top: 12px;
+            padding: 10px 14px;
             background: #ffebee;
-            border-radius: 16px;
-            border-right: 4px solid #d32f2f;
-            color: #c62828;
+            border-radius: 14px;
+            border: 2px solid #d32f2f;
+            color: #d32f2f;
             font-weight: 700;
-            font-size: 0.85rem;
+            text-align: center;
+            font-size: 0.75rem;
+            direction: rtl;
         }
         body.dark .gold-warning {
-            background: #2c1a1a;
-            color: #ff8a80;
-            border-right-color: #ff6f60;
+            background: #3d1a1a;
+            border-color: #ef5350;
+            color: #ef9a9a;
         }
-        .gold-warning i { margin-left: 8px; }
+        .gold-warning i {
+            margin-left: 6px;
+        }
 
         /* ===== UPDATE TOAST ===== */
         .update-toast {
             position: fixed;
-            bottom: 20px;
+            bottom: 16px;
             left: 50%;
             transform: translateX(-50%);
             background: var(--gold);
             color: #1a1a1a;
-            padding: 12px 24px;
-            border-radius: 50px;
+            padding: 10px 20px;
+            border-radius: 40px;
             font-weight: 700;
-            box-shadow: 0 4px 20px rgba(212,175,55,0.4);
+            box-shadow: 0 4px 16px rgba(212,175,55,0.4);
             display: none;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             z-index: 999;
             cursor: pointer;
             transition: 0.3s;
+            font-size: 0.9rem;
         }
         .update-toast:hover { transform: translateX(-50%) scale(1.02); }
-        .update-toast i { font-size: 1.2rem; }
+        .update-toast i { font-size: 1rem; }
 
         /* ===== LAST UPDATE ===== */
         .last-update {
             text-align: center;
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             color: #888;
-            margin-top: 16px;
+            margin-top: 12px;
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 16px;
             flex-wrap: wrap;
         }
         body.dark .last-update { color: #aaa; }
@@ -345,10 +374,10 @@
 
         /* ===== FOOTER ===== */
         .footer {
-            margin-top: 30px;
-            padding: 20px 0;
+            margin-top: 24px;
+            padding: 16px 0;
             text-align: center;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             color: #888;
             border-top: 1px solid #ddd;
             width: 100%;
@@ -360,25 +389,31 @@
         .footer a:hover { text-decoration: underline; }
 
         /* ===== RESPONSIVE ===== */
-        @media (max-width: 480px) {
-            .rates-grid { grid-template-columns: 1fr 1fr; }
-            .card { padding: 16px; }
-            .converter-row select,
-            .converter-row input,
-            .converter-row button { min-width: 100%; }
+        @media (max-width: 420px) {
+            .rates-grid { gap: 6px; }
+            .rate-item { padding: 8px 4px; }
+            .rate-item .value { font-size: 0.85rem; }
+            .gold-result .price-box .amount { font-size: 0.95rem; }
+            .result-value { font-size: 1rem; }
+            .card { padding: 12px; }
         }
-        .flex { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .flex { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .text-gold { color: var(--gold); }
         .btn-gold {
             background: linear-gradient(145deg, var(--gold), #b8962e);
             border: none;
-            padding: 10px 20px;
-            border-radius: 50px;
+            padding: 10px 16px;
+            border-radius: 40px;
             font-weight: 700;
             color: #1a1a1a;
             cursor: pointer;
             transition: 0.2s;
             font-family: inherit;
+            font-size: 0.9rem;
+            flex: 1 1 100%;
+        }
+        @media (min-width: 480px) {
+            .btn-gold { flex: 0 1 auto; min-width: 80px; }
         }
         .btn-gold:hover { transform: scale(1.03); }
     </style>
@@ -389,14 +424,14 @@
     <div class="splash-screen" id="splashScreen">
         <div class="splash-icon">💱</div>
         <div class="splash-title">صرّاف</div>
-        <div class="splash-sub">التحويل الذكي للعملات والذهب</div>
+        <div class="splash-sub">تحويل العملات والذهب بأسعار فورية</div>
         <div class="splash-loader"></div>
     </div>
 
     <!-- ===== UPDATE TOAST ===== -->
     <div class="update-toast" id="updateToast">
         <i class="fas fa-sync-alt"></i>
-        <span>تحديث جديد متاح! اضغط للتحديث</span>
+        <span>تحديث جديد متاح!</span>
     </div>
 
     <!-- ===== MAIN CONTENT ===== -->
@@ -409,7 +444,7 @@
                 <h1>صرّاف</h1>
             </div>
             <div class="header-actions">
-                <button id="refreshBtn" title="تحديث الأسعار يدوياً"><i class="fas fa-sync-alt"></i></button>
+                <button id="refreshBtn" title="تحديث الأسعار"><i class="fas fa-sync-alt"></i></button>
                 <button id="themeToggle" title="الوضع الليلي"><i class="fas fa-moon"></i></button>
             </div>
         </header>
@@ -503,10 +538,9 @@
                     <div class="amount" id="goldTryPrice">-</div>
                 </div>
             </div>
-            <!-- ===== إضافة التحذير هنا ===== -->
             <div class="gold-warning">
                 <i class="fas fa-exclamation-triangle"></i>
-                ⚠️ هذه الميزة قيد التجربة - الرجاء عدم الاعتماد على الأرقام والتأكد من السعر بشكل صحيح
+                ⚠️ تنبيه: الأسعار تجريبية وغير معتمدة. يُرجى التأكد من السعر بشكل مستقل.
             </div>
         </div>
 
@@ -517,8 +551,8 @@
         </div>
 
         <!-- زر تثبيت التطبيق (PWA) -->
-        <div style="text-align:center; margin: 16px 0;">
-            <button id="installAppBtn" style="display:none; background:linear-gradient(145deg, #1a2a3a, #2c3e50); color:white; border:none; padding:12px 28px; border-radius:50px; font-weight:700; cursor:pointer;">
+        <div style="text-align:center; margin: 12px 0;">
+            <button id="installAppBtn" style="display:none; background:linear-gradient(145deg, #1a2a3a, #2c3e50); color:white; border:none; padding:10px 24px; border-radius:40px; font-weight:700; cursor:pointer; font-size:0.9rem;">
                 📲 تثبيت التطبيق
             </button>
         </div>
@@ -527,37 +561,40 @@
         <footer class="footer">
             <p>تم التصميم بواسطة <strong>أحمد كلاوي</strong> | Designed by <strong>Ahmad Kllawe</strong></p>
             <p><a href="#" id="contactLink"><i class="fas fa-envelope"></i> تواصل معنا</a></p>
-            <p style="font-size:0.65rem; opacity:0.6;">© 2026 جميع الحقوق محفوظة</p>
+            <p style="font-size:0.55rem; opacity:0.6;">© 2026 جميع الحقوق محفوظة</p>
         </footer>
     </div>
 
     <!-- ===== CONTACT MODAL ===== -->
     <div id="contactModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); z-index:9999; justify-content:center; align-items:center;">
-        <div style="background:white; border-radius:28px; padding:30px; max-width:400px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-            <h3 style="color:#1a2a3a; margin-bottom:20px;"><i class="fas fa-headset text-gold"></i> تواصل معنا</h3>
+        <div style="background:white; border-radius:24px; padding:24px; max-width:360px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+            <h3 style="color:#1a2a3a; margin-bottom:16px;"><i class="fas fa-headset text-gold"></i> تواصل معنا</h3>
             <p><i class="fas fa-phone"></i> <strong>الهاتف:</strong> <a href="tel:+963954879356" style="color:var(--gold);">+963 954 879 356</a></p>
             <p><i class="fas fa-envelope"></i> <strong>البريد:</strong> <a href="mailto:ahmadkelaui166@gmail.com" style="color:var(--gold);">ahmadkelaui166@gmail.com</a></p>
-            <button onclick="document.getElementById('contactModal').style.display='none'" style="margin-top:20px; background:var(--gold); border:none; padding:10px 30px; border-radius:50px; font-weight:700; cursor:pointer;">إغلاق</button>
+            <button onclick="document.getElementById('contactModal').style.display='none'" style="margin-top:16px; background:var(--gold); border:none; padding:8px 28px; border-radius:40px; font-weight:700; cursor:pointer;">إغلاق</button>
         </div>
     </div>
 
     <!-- ===== SCRIPTS ===== -->
     <script type="module" src="assets/js/main.js"></script>
-
-    <!-- Service Worker Registration + Update Button -->
     <script>
+        // Service Worker Registration with forced update for mobile
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
+            navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
                 .then(reg => {
                     console.log('✅ SW registered');
+                    // Check for updates every 10 seconds on mobile
+                    setInterval(() => {
+                        reg.update().catch(err => console.warn('Update check failed:', err));
+                    }, 10000);
                     let newWorker;
                     reg.addEventListener('updatefound', () => {
                         newWorker = reg.installing;
                         newWorker.addEventListener('statechange', () => {
                             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                const updateToast = document.getElementById('updateToast');
-                                updateToast.style.display = 'flex';
-                                updateToast.onclick = () => {
+                                const toast = document.getElementById('updateToast');
+                                toast.style.display = 'flex';
+                                toast.onclick = () => {
                                     newWorker.postMessage('skipWaiting');
                                     window.location.reload();
                                 };
@@ -565,15 +602,17 @@
                         });
                     });
                 })
-                .catch(err => console.error('❌ SW failed:', err));
+                .catch(err => console.error('❌ SW registration failed:', err));
         }
 
-        document.getElementById('updateToast')?.addEventListener('click', () => {
-            if (navigator.serviceWorker.controller) {
-                navigator.serviceWorker.controller.postMessage('skipWaiting');
+        // Force reload if SW takes too long
+        setTimeout(() => {
+            const main = document.getElementById('mainContent');
+            if (main && main.style.display === 'none') {
+                console.log('🔄 Forcing reload after timeout');
                 window.location.reload();
             }
-        });
+        }, 5000);
     </script>
 </body>
 </html>

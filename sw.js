@@ -1,4 +1,4 @@
-const CACHE_NAME = "sarf-app-v4";
+const CACHE_NAME = "sarf-app-v5";
 const urlsToCache = [
   ".",
   "index.html",
@@ -27,6 +27,13 @@ self.addEventListener("activate", event => {
 });
 
 self.addEventListener("fetch", event => {
+  // تجاهل طلبات الـ API ولا تخزنها مؤقتاً
+  if (event.request.url.includes('/api/') || 
+      event.request.url.includes('gold-api.com') ||
+      event.request.url.includes('exchangerate')) {
+    event.respondWith(fetch(event.request).catch(() => new Response('', { status: 408 })));
+    return;
+  }
   event.respondWith(
     fetch(event.request).catch(() => caches.match(event.request))
   );
