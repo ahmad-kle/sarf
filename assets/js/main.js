@@ -194,8 +194,8 @@ function updateUI() {
     const gramPriceUsd = goldUsdOunce / 31.1035;
     const karat21Factor = 21 / 24;
     const gram21Usd = gramPriceUsd * karat21Factor;
-    const sellPrice = gram21Usd + 1;
-    const buyPrice = gram21Usd - 1;
+    const sellPrice = gram21Usd ;
+    const buyPrice = gram21Usd - 2;
     
     gold21GramRateEl.textContent = `${formatNumber(buyPrice)} / ${formatNumber(sellPrice)}`;
     gold21GramSubEl.innerHTML = `$ / غرام · <span style="color:#d32f2f; font-weight:800; background:#ffebee; padding:2px 8px; border-radius:12px; font-size:0.6rem;">⚠️ تجريبي</span>`;
@@ -262,8 +262,8 @@ function calcGold() {
     }
 
     const gramPriceUsd = (goldUsdOunce / 31.1035) * (karat / 24);
-    const sellPricePerGram = gramPriceUsd + 1;
-    const buyPricePerGram = gramPriceUsd - 1;
+    const sellPricePerGram = gramPriceUsd ;
+    const buyPricePerGram = gramPriceUsd -2;
 
     const totalSellUsd = sellPricePerGram * weight;
     const totalBuyUsd = buyPricePerGram * weight;
