@@ -47,11 +47,11 @@ const contactLink = document.getElementById('contactLink');
 const contactModal = document.getElementById('contactModal');
 
 // ---------- القيم المتغيرة ----------
-let usdSyrBuy = 13200;
-let usdSyrSell = 13100;
-let usdTryBuy = 47.15;
-let usdTrySell = 46.50;
-let goldUsdOunce = 4016.47;
+let usdSyrBuy = "";
+let usdSyrSell = "";
+let usdTryBuy = "";
+let usdTrySell = "";
+let goldUsdOunce = "";
 
 const ratesRef = ref(db, 'rates');
 
@@ -83,10 +83,10 @@ function listenToFirebaseRates() {
     onValue(ratesRef, (snapshot) => {
         if (snapshot.exists()) {
             const data = snapshot.val();
-            usdSyrBuy = data.usd_syr_buy || 13200;
-            usdSyrSell = data.usd_syr_sell || 13100;
-            usdTryBuy = data.usd_try_buy || 47.15;
-            usdTrySell = data.usd_try_sell || 46.50;
+            usdSyrBuy = data.usd_syr_buy || "";
+            usdSyrSell = data.usd_syr_sell || "13100";
+            usdTryBuy = data.usd_try_buy || "";
+            usdTrySell = data.usd_try_sell || "";
             console.log('📊 تحديث العملات من Firebase');
             updateUI();
             if (data.last_update) {
@@ -95,19 +95,19 @@ function listenToFirebaseRates() {
             }
         } else {
             console.log('📊 لا توجد بيانات، استخدام القيم الافتراضية');
-            usdSyrBuy = 13200;
-            usdSyrSell = 13100;
-            usdTryBuy = 47.15;
-            usdTrySell = 46.50;
+            usdSyrBuy = "";
+            usdSyrSell = "";
+            usdTryBuy = "";
+            usdTrySell = "";
             updateUI();
         }
     }, (error) => {
         console.warn('⚠️ خطأ في Firebase:', error);
         // استخدام القيم الافتراضية عند فشل Firebase
-        usdSyrBuy = 13200;
-        usdSyrSell = 13100;
-        usdTryBuy = 47.15;
-        usdTrySell = 46.50;
+        usdSyrBuy = "";
+        usdSyrSell = "";
+        usdTryBuy = "";
+        usdTrySell = "";
         updateUI();
     });
 }
