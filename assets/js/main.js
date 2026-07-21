@@ -1,3 +1,10 @@
+// ============================================================
+//  صرّاف - النسخة النهائية مع ملاحظة تحذيرية للذهب
+// ============================================================
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
 const firebaseConfig = {
     apiKey: "AIzaSyD5I0tSk73Iue1WaU3Jx_Q1LuwnFA2yrTo",
     authDomain: "ahmad-1a32b.firebaseapp.com",
@@ -8,123 +15,308 @@ const firebaseConfig = {
     measurementId: "G-C0GFV8C96P"
 };
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
-// ========== تسجيل Service Worker (لـ PWA) ==========
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js')
-        .then(reg => console.log('✅ SW registered:', reg))
-        .catch(err => console.error('❌ SW failed:', err));
-}
-
-// ========== شاشة التحميل ==========
-window.addEventListener('load', () => {
-    setTimeout(() => {
-        const splash = document.getElementById('splashScreen');
-        const main = document.getElementById('mainContent');
-        if (splash && main) {
-            splash.style.opacity = '0';
-            setTimeout(() => {
-                splash.style.display = 'none';
-                main.style.display = 'block';
-            }, 500);
-        }
-    }, 1500);
-});
-
-// ========== زر تثبيت التطبيق ==========
-let deferredPrompt;
-const installBtn = document.getElementById('installAppBtn');
-
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    if (installBtn) installBtn.style.display = 'inline-block';
-});
-
-if (installBtn) {
-    installBtn.addEventListener('click', async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            console.log(`User ${outcome}`);
-            deferredPrompt = null;
-            installBtn.style.display = 'none';
-        }
-    });
-}
-
-// ========== مودال التواصل ==========
-const modal = document.getElementById('contactModal');
-const contactLink = document.getElementById('contactLink');
-const closeModal = document.querySelector('.close-modal');
-
-if (contactLink) {
-    contactLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        if (modal) modal.style.display = 'flex';
-    });
-}
-if (closeModal) {
-    closeModal.addEventListener('click', () => {
-        if (modal) modal.style.display = 'none';
-    });
-}
-window.addEventListener('click', (e) => {
-    if (e.target === modal) modal.style.display = 'none';
-});
-
-// ========== بدء التطبيق ==========
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// الأسعار
-let usdSyrBuy = 137;
-let usdSyrSell = 138;
-let usdTryBuy = 44;
-let usdTrySell = 45;
+// ---------- عناصر DOM ----------
+const splash = document.getElementById('splashScreen');
+const main = document.getElementById('mainContent');
+const usdSyrRateEl = document.getElementById('usdSyrRate');
+const usdTryRateEl = document.getElementById('usdTryRate');
+const trySyrRateEl = document.getElementById('trySyrRate');
+const gold21GramRateEl = document.getElementById('gold21GramRate');
+const gold21GramSubEl = document.getElementById('gold21GramSub');
+const lastDateEl = document.getElementById('lastDate');
+const lastTimeEl = document.getElementById('lastTime');
+const amountInput = document.getElementById('amount');
+const fromSelect = document.getElementById('fromCurrency');
+const toSelect = document.getElementById('toCurrency');
+const sellResult = document.getElementById('sellResult');
+const buyResult = document.getElementById('buyResult');
+const convertBtn = document.getElementById('convertBtn');
+const refreshBtn = document.getElementById('refreshBtn');
+const themeToggle = document.getElementById('themeToggle');
+const installBtn = document.getElementById('installAppBtn');
+const goldWeight = document.getElementById('goldWeight');
+const goldKarat = document.getElementById('goldKarat');
+const calcGoldBtn = document.getElementById('calcGoldBtn');
+const goldUsdPrice = document.getElementById('goldUsdPrice');
+const goldSyrPrice = document.getElementById('goldSyrPrice');
+const goldTryPrice = document.getElementById('goldTryPrice');
+const contactLink = document.getElementById('contactLink');
+const contactModal = document.getElementById('contactModal');
+
+// ---------- القيم المتغيرة ----------
+let usdSyrBuy = 13200;
+let usdSyrSell = 13100;
+let usdTryBuy = 47.15;
+let usdTrySell = 46.50;
+let goldUsdOunce = 4016.47;
 
 const ratesRef = ref(db, 'rates');
 
-// إنشاء بيانات افتراضية إذا لم توجد
-onValue(ratesRef, (snapshot) => {
-    if (!snapshot.exists()) {
-        set(ratesRef, {
-            usd_syr_buy: 137, usd_syr_sell: 138,
-            usd_try_buy: 44, usd_try_sell: 45,
-            last_update: new Date().toISOString()
-        }).catch(console.error);
+// ---------- دوال مساعدة ----------
+function formatNumber(num) {
+    if (num === undefined || num === null || isNaN(num)) return '0';
+    if (Number.isInteger(num)) {
+        return new Intl.NumberFormat('en', { maximumFractionDigits: 0, minimumFractionDigits: 0 }).format(num);
+    } else {
+        return new Intl.NumberFormat('en', { maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(num);
     }
-});
+}
 
-// قراءة الأسعار
-onValue(ratesRef, (snapshot) => {
-    if (snapshot.exists()) {
-        const data = snapshot.val();
-        usdSyrBuy = data.usd_syr_buy || 137;
-        usdSyrSell = data.usd_syr_sell || 138;
-        usdTryBuy = data.usd_try_buy || 44;
-        usdTrySell = data.usd_try_sell || 45;
+function formatDate(ts) {
+    if (!ts) return '--';
+    const d = new Date(ts);
+    return d.toLocaleDateString('ar-EG');
+}
+function formatTime(ts) {
+    if (!ts) return '--';
+    const d = new Date(ts);
+    return d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
 
-        document.getElementById('usdRate').innerHTML = `شراء: ${usdSyrBuy} / بيع: ${usdSyrSell}`;
-        const trySyrBuy = usdSyrBuy / usdTrySell;
-        const trySyrSell = usdSyrSell / usdTryBuy;
-        document.getElementById('trySyrRate').innerHTML = `شراء: ${trySyrBuy.toFixed(2)} / بيع: ${trySyrSell.toFixed(2)}`;
-        document.getElementById('usdTryRate').innerHTML = `شراء: ${usdTryBuy} / بيع: ${usdTrySell}`;
+// ============================================================
+// 🔥 مراقبة تغييرات Firebase (للعملات فقط)
+// ============================================================
+function listenToFirebaseRates() {
+    onValue(ratesRef, (snapshot) => {
+        if (snapshot.exists()) {
+            const data = snapshot.val();
+            usdSyrBuy = data.usd_syr_buy || 13200;
+            usdSyrSell = data.usd_syr_sell || 13100;
+            usdTryBuy = data.usd_try_buy || 47.15;
+            usdTrySell = data.usd_try_sell || 46.50;
+            console.log('📊 تحديث العملات من Firebase');
+            updateUI();
+            if (data.last_update) {
+                lastDateEl.textContent = formatDate(data.last_update);
+                lastTimeEl.textContent = formatTime(data.last_update);
+            }
+        } else {
+            console.log('📊 لا توجد بيانات، استخدام القيم الافتراضية');
+            usdSyrBuy = 13200;
+            usdSyrSell = 13100;
+            usdTryBuy = 47.15;
+            usdTrySell = 46.50;
+            updateUI();
+        }
+    });
+}
 
-        const lastUpdate = data.last_update || "";
-        if (lastUpdate) {
-            const d = new Date(lastUpdate);
-            document.getElementById('lastDate').innerText = d.toLocaleDateString('ar-EG');
-            document.getElementById('lastTime').innerText = d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+// ============================================================
+// 🔥 جلب سعر الذهب من API مباشرة
+// ============================================================
+async function fetchGoldPrice(showToastMsg = true) {
+    try {
+        console.log('🥇 جاري جلب سعر الذهب...');
+        let newPrice = null;
+        const res = await fetch('https://api.gold-api.com/price/XAU');
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.price && data.price > 0) {
+                newPrice = parseFloat(data.price);
+                console.log('✅ Gold (Gold-API):', newPrice);
+            }
+        }
+        if (!newPrice) {
+            const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+            const altRes = await fetch(proxyUrl + 'https://api.gold-api.com/price/XAU');
+            if (altRes.ok) {
+                const altData = await altRes.json();
+                if (altData && altData.price && altData.price > 0) {
+                    newPrice = parseFloat(altData.price);
+                    console.log('✅ Gold (Gold-API via proxy):', newPrice);
+                }
+            }
+        }
+        if (newPrice) {
+            goldUsdOunce = newPrice;
+            console.log(`✅ تم تحديث الذهب: ${goldUsdOunce}`);
+            updateUI();
+            if (showToastMsg) {
+                showToast('✅ تم تحديث الذهب');
+            }
+        } else {
+            console.warn('⚠️ فشل جلب الذهب');
+            if (showToastMsg) {
+                showToast('⚠️ فشل تحديث الذهب');
+            }
+        }
+    } catch (err) {
+        console.error('❌ خطأ في جلب الذهب:', err);
+        if (showToastMsg) {
+            showToast('⚠️ حدث خطأ');
         }
     }
+}
+
+// ---------- تحديث الواجهة ----------
+function updateUI() {
+    usdSyrRateEl.textContent = `${formatNumber(usdSyrBuy)} / ${formatNumber(usdSyrSell)}`;
+    usdTryRateEl.textContent = `${formatNumber(usdTryBuy)} / ${formatNumber(usdTrySell)}`;
+    const tryToSyrBuy = usdSyrBuy / usdTrySell;
+    const tryToSyrSell = usdSyrSell / usdTryBuy;
+    trySyrRateEl.textContent = `${formatNumber(tryToSyrBuy)} / ${formatNumber(tryToSyrSell)}`;
+
+    const gramPriceUsd = goldUsdOunce / 31.1035;
+    const karat21Factor = 21 / 24;
+    const gram21Usd = gramPriceUsd * karat21Factor;
+    const sellPrice = gram21Usd + 1;
+    const buyPrice = gram21Usd - 1;
+    
+    gold21GramRateEl.textContent = `${formatNumber(buyPrice)} / ${formatNumber(sellPrice)}`;
+    gold21GramSubEl.innerHTML = ` · <span style="color:#d32f2f; font-weight:800; background:#ffebee; padding:2px 8px; border-radius:12px; font-size:0.7rem;">⚠️ تجريبي   </span>`;
+}
+
+// ============================================================
+// دوال التحويل
+// ============================================================
+function convertCurrency(amount, from, to, type = 'sell') {
+    if (amount === 0) return 0;
+    if (from === to) return amount;
+
+    let usdAmount = 0;
+    switch (from) {
+        case 'usd':
+            usdAmount = amount;
+            break;
+        case 'try':
+            usdAmount = amount / (type === 'sell' ? usdTrySell : usdTryBuy);
+            break;
+        case 'syr_new':
+            usdAmount = amount / (type === 'sell' ? usdSyrSell : usdSyrBuy);
+            break;
+        case 'syr_old':
+            usdAmount = (amount / 100) / (type === 'sell' ? usdSyrSell : usdSyrBuy);
+            break;
+        default:
+            return 0;
+    }
+
+    switch (to) {
+        case 'usd':
+            return usdAmount;
+        case 'try':
+            return usdAmount * (type === 'sell' ? usdTryBuy : usdTrySell);
+        case 'syr_new':
+            return usdAmount * (type === 'sell' ? usdSyrBuy : usdSyrSell);
+        case 'syr_old':
+            return (usdAmount * (type === 'sell' ? usdSyrBuy : usdSyrSell)) * 100;
+        default:
+            return 0;
+    }
+}
+
+function convert() {
+    const amount = parseFloat(amountInput.value) || 0;
+    const from = fromSelect.value;
+    const to = toSelect.value;
+    const sellAmount = convertCurrency(amount, from, to, 'sell');
+    const buyAmount = convertCurrency(amount, from, to, 'buy');
+    sellResult.textContent = formatNumber(sellAmount);
+    buyResult.textContent = formatNumber(buyAmount);
+}
+
+// ---------- حاسبة الذهب ----------
+function calcGold() {
+    const weight = parseFloat(goldWeight.value) || 0;
+    const karat = parseInt(goldKarat.value) || 24;
+    if (weight <= 0) {
+        goldUsdPrice.textContent = '0 / 0';
+        goldSyrPrice.textContent = '0 / 0';
+        goldTryPrice.textContent = '0 / 0';
+        return;
+    }
+
+    const gramPriceUsd = (goldUsdOunce / 31.1035) * (karat / 24);
+    const sellPricePerGram = gramPriceUsd + 1;
+    const buyPricePerGram = gramPriceUsd - 1;
+
+    const totalSellUsd = sellPricePerGram * weight;
+    const totalBuyUsd = buyPricePerGram * weight;
+    const totalSellSyr = totalSellUsd * usdSyrBuy;
+    const totalBuySyr = totalBuyUsd * usdSyrSell;
+    const totalSellTry = totalSellUsd * usdTryBuy;
+    const totalBuyTry = totalBuyUsd * usdTrySell;
+
+    goldUsdPrice.textContent = `${formatNumber(totalBuyUsd)} / ${formatNumber(totalSellUsd)}`;
+    goldSyrPrice.textContent = `${formatNumber(totalBuySyr)} / ${formatNumber(totalSellSyr)}`;
+    goldTryPrice.textContent = `${formatNumber(totalBuyTry)} / ${formatNumber(totalSellTry)}`;
+}
+
+// ---------- Toast ----------
+function showToast(msg) {
+    const old = document.querySelector('.custom-toast');
+    if (old) old.remove();
+    const div = document.createElement('div');
+    div.className = 'custom-toast';
+    div.style.cssText = `
+        position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+        background: var(--gold); color: #1a1a1a; padding: 12px 24px;
+        border-radius: 50px; font-weight: 700; z-index: 9999;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2); font-family: 'Tajawal', sans-serif;
+        transition: opacity 0.3s;
+    `;
+    div.textContent = msg;
+    document.body.appendChild(div);
+    setTimeout(() => { div.style.opacity = '0'; setTimeout(() => div.remove(), 300); }, 3000);
+}
+
+// ---------- مستمعات الأحداث ----------
+convertBtn.addEventListener('click', convert);
+amountInput.addEventListener('input', convert);
+fromSelect.addEventListener('change', convert);
+toSelect.addEventListener('change', convert);
+
+refreshBtn.addEventListener('click', () => {
+    fetchGoldPrice(false);
 });
 
-// ========== الإعلانات (مصفوفة) ==========
+calcGoldBtn.addEventListener('click', calcGold);
+goldWeight.addEventListener('input', calcGold);
+goldKarat.addEventListener('change', calcGold);
+
+// ---------- الوضع الليلي ----------
+themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+    localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    themeToggle.innerHTML = document.body.classList.contains('dark') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+});
+if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark');
+    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+}
+
+// ---------- مودال التواصل ----------
+contactLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    contactModal.style.display = 'flex';
+});
+contactModal.addEventListener('click', (e) => {
+    if (e.target === contactModal) contactModal.style.display = 'none';
+});
+
+// ---------- تثبيت PWA ----------
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'inline-block';
+});
+installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`User ${outcome}`);
+        deferredPrompt = null;
+        installBtn.style.display = 'none';
+    }
+});
+
+// ---------- الإعلانات ----------
 let adsArray = [];
-let currentAdIndex = 0;
+let currentAd = 0;
 let adInterval = null;
 let adsEnabled = false;
 
@@ -133,150 +325,60 @@ const adLink = document.getElementById('adLink');
 const adImage = document.getElementById('adImage');
 const adText = document.getElementById('adText');
 
-function showNextAd() {
+function showAd() {
     if (!adsEnabled || !adsArray.length) {
-        if (adBanner) adBanner.style.display = 'none';
+        adBanner.style.display = 'none';
         return;
     }
-    if (adBanner) adBanner.style.display = 'block';
-    const ad = adsArray[currentAdIndex];
+    adBanner.style.display = 'block';
+    const ad = adsArray[currentAd];
     if (ad) {
         adImage.src = ad.imageUrl || '';
-        adText.innerText = ad.text || '';
+        adText.textContent = ad.text || '';
         adLink.href = ad.link || '#';
-        if (!ad.imageUrl) adImage.style.display = 'none';
-        else adImage.style.display = 'block';
+        adImage.style.display = ad.imageUrl ? 'block' : 'none';
     }
-    currentAdIndex = (currentAdIndex + 1) % adsArray.length;
+    currentAd = (currentAd + 1) % adsArray.length;
 }
 
-function startAdRotation() {
+function startAds() {
     if (adInterval) clearInterval(adInterval);
     if (adsEnabled && adsArray.length) {
-        showNextAd();
-        adInterval = setInterval(showNextAd, 7000);
+        showAd();
+        adInterval = setInterval(showAd, 7000);
     } else {
-        if (adBanner) adBanner.style.display = 'none';
+        adBanner.style.display = 'none';
     }
 }
 
 const adsRef = ref(db, 'adsArray');
 const adsEnabledRef = ref(db, 'adsEnabled');
 
-onValue(adsRef, (snapshot) => {
-    if (snapshot.exists() && Array.isArray(snapshot.val())) {
-        adsArray = snapshot.val();
+onValue(adsRef, (snap) => {
+    if (snap.exists() && Array.isArray(snap.val())) {
+        adsArray = snap.val();
     } else {
         adsArray = [];
     }
-    startAdRotation();
+    startAds();
 });
 
-onValue(adsEnabledRef, (snapshot) => {
-    adsEnabled = snapshot.val() === true;
-    startAdRotation();
+onValue(adsEnabledRef, (snap) => {
+    adsEnabled = snap.val() === true;
+    startAds();
 });
 
-// ========== دوال التحويل (بدون تغيير منطقها) ==========
-function getSellPrice(amount, from, to) {
-    if (from === to) return amount;
-    if (from === 'syr_old' && to === 'syr_new') return amount / 100;
-    if (from === 'syr_new' && to === 'syr_old') return amount * 100;
+// ============================================================
+// 🚀 تشغيل التطبيق
+// ============================================================
+setTimeout(() => {
+    splash.classList.add('hidden');
+    main.style.display = 'block';
+}, 1500);
 
-    let usdValue = 0;
-    switch (from) {
-        case 'usd': usdValue = amount; break;
-        case 'try': usdValue = amount / usdTrySell; break;
-        case 'syr_new': usdValue = amount / usdSyrSell; break;
-        case 'syr_old': usdValue = (amount / 100) / usdSyrSell; break;
-    }
-    switch (to) {
-        case 'usd': return usdValue;
-        case 'try': return usdValue * usdTryBuy;
-        case 'syr_new': return usdValue * usdSyrBuy;
-        case 'syr_old': return (usdValue * usdSyrBuy) * 100;
-    }
-    return 0;
-}
+listenToFirebaseRates();
+fetchGoldPrice(false);
+setInterval(() => fetchGoldPrice(false), 300000);
+setTimeout(convert, 500);
 
-function getBuyPrice(amount, from, to) {
-    if (from === to) return amount;
-    if (from === 'syr_old' && to === 'syr_new') return amount / 100;
-    if (from === 'syr_new' && to === 'syr_old') return amount * 100;
-
-    let usdValue = 0;
-    switch (from) {
-        case 'usd': usdValue = amount; break;
-        case 'try': usdValue = amount / usdTryBuy; break;
-        case 'syr_new': usdValue = amount / usdSyrBuy; break;
-        case 'syr_old': usdValue = (amount / 100) / usdSyrBuy; break;
-    }
-    switch (to) {
-        case 'usd': return usdValue;
-        case 'try': return usdValue * usdTrySell;
-        case 'syr_new': return usdValue * usdSyrSell;
-        case 'syr_old': return (usdValue * usdSyrSell) * 100;
-    }
-    return 0;
-}
-
-// ========== دالة جديدة لعرض الأرقام بدون أصفار عشرية زائدة + فواصل آلاف ==========
-function formatNumber(value) {
-    if (isNaN(value)) return '0';
-    // استخدام Intl.NumberFormat للغة العربية: يفصل الآلاف ويقلل الأصفار العشرية
-    return new Intl.NumberFormat('en', {
-        maximumFractionDigits: 2,
-        minimumFractionDigits: 0
-    }).format(value);
-}
-
-document.getElementById('convertBtn').addEventListener('click', () => {
-    let amount = parseFloat(document.getElementById('amount').value);
-    if (isNaN(amount)) amount = 0;
-    const from = document.getElementById('fromCurrency').value;
-    const to = document.getElementById('toCurrency').value;
-    
-    const sellValue = getSellPrice(amount, from, to);
-    const buyValue = getBuyPrice(amount, from, to);
-    
-    document.getElementById('sellResult').innerText = formatNumber(sellValue);
-    document.getElementById('buyResult').innerText = formatNumber(buyValue);
-});
-
-// ========== الوضع الليلي ==========
-const themeToggle = document.getElementById('themeToggle');
-if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
-themeToggle.addEventListener('click', () => {
-    document.body.classList.toggle('dark');
-    localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
-    themeToggle.innerText = document.body.classList.contains('dark') ? '☀️ نهاري' : '🌙 ليلي';
-});
-if (document.body.classList.contains('dark')) themeToggle.innerText = '☀️ نهاري';
-else themeToggle.innerText = '🌙 ليلي';
-
-// ========== إظهار تعليمات التثبيت لمستخدمي iOS ==========
-function isIOS() {
-    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-}
-
-const iosGuide = document.getElementById('iosInstallGuide');
-const closeBtn = document.getElementById('closeIOSGuide');
-
-if (iosGuide && isIOS()) {
-    const isInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-    
-    if (!isInstalled) {
-        iosGuide.style.display = 'block';
-        
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => {
-                iosGuide.style.display = 'none';
-                localStorage.setItem('ios_prompt_closed', 'true');
-            });
-        }
-        
-        if (localStorage.getItem('ios_prompt_closed') === 'true') {
-            iosGuide.style.display = 'none';
-        }
-    }
-}
+console.log('✅ تطبيق صرّاف جاهز');
